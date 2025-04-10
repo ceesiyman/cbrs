@@ -140,10 +140,10 @@
                 <h3>For Clients</h3>
                 <ul class="footer-links">
                     <li class="footer-link">
-                        <a href="{{ url('/find-constructors') }}">Find Constructors</a>
+                    <a href="#" class="nav-link" onclick="openSearchPopup(); return false;">Find constructors</a>
                     </li>
                     <li class="footer-link">
-                        <a href="{{ url('/post-project') }}">Post Project</a>
+                        <a href="{{ route('work.create') }}">Post Project</a>
                     </li>
                     <li class="footer-link">
                         <a href="{{ url('/refund-policy') }}">Refund Policy</a>
@@ -159,10 +159,10 @@
                 <h3>For Constructors</h3>
                 <ul class="footer-links">
                     <li class="footer-link">
-                        <a href="{{ url('/find-work') }}">Find Work</a>
+                    <a href="#" class="nav-link" onclick="openWorkSearchPopup(); return false;">Find work</a>
                     </li>
                     <li class="footer-link">
-                        <a href="{{ url('/create-account') }}">Create Account</a>
+                        <a href="{{ route('register') }}" class="nav-link">Create Account</a>
                     </li>
                 </ul>
             </div>
@@ -176,19 +176,19 @@
                             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
                             <circle cx="12" cy="10" r="3"/>
                         </svg>
-                        Kenya
+                        Dar Es Salaam, Tanzania
                     </li>
                     <li class="contact-info">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
                         </svg>
-                        <a href="tel:+254700000000">+254700000000</a>
+                        <a href="tel:+254700000000">+255744330332</a>
                     </li>
                     <li class="contact-info">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                         </svg>
-                        <a href="mailto:bluelance@gmail.com">bluelance@gmail.com</a>
+                        <a href="mailto:bluelance@gmail.com">cbrs@gmail.com</a>
                     </li>
                 </ul>
             </div>
@@ -199,3 +199,312 @@
         </div>
     </div>
 </footer> 
+
+<!-- Search Popup -->
+<div id="searchPopup" class="search-popup">
+    <div class="search-container">
+        <div class="search-header">
+            <h3 class="search-title">Search Constructors</h3>
+            <button class="close-btn" onclick="closeSearchPopup()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="search-form">
+            <input 
+                type="text" 
+                id="constructorSearch" 
+                class="search-input" 
+                placeholder="Search by name or skills..."
+                oninput="searchConstructors(this.value)"
+            >
+        </div>
+        <div id="searchResults" class="search-results">
+            <div class="loading">
+                Type to search constructors...
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modify the work search popup HTML to include a form -->
+<div id="workSearchPopup" class="search-popup">
+    <div class="search-container">
+        <div class="search-header">
+            <h3 class="search-title">Search Available Works</h3>
+            <button class="close-btn" onclick="closeWorkSearchPopup()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="search-form">
+            <div class="search-filters">
+                <select id="skillFilter" class="filter-select" multiple>
+                    <option value="">Select Skills</option>
+                    @foreach(App\Models\Skill::orderBy('name')->get() as $skill)
+                        <option value="{{ $skill->id }}">{{ $skill->name }}</option>
+                    @endforeach
+                </select>
+                
+                <select id="timeFilter" class="filter-select">
+                    <option value="">Any Time</option>
+                    <option value="today">Today</option>
+                    <option value="week">This Week</option>
+                    <option value="month">This Month</option>
+                </select>
+            </div>
+            
+            <input type="text" 
+                   id="workSearch" 
+                   class="search-input" 
+                   placeholder="Search works by title or description..."
+                   oninput="searchWorks()">
+        </div>
+        
+        <div id="workSearchResults" class="search-results">
+            <div class="loading">
+                Search for available works...
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleMobileMenu() {
+        const mobileMenu = document.getElementById('mobileMenu');
+        mobileMenu.classList.toggle('show');
+    }
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(event) {
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        
+        if (!mobileMenu.contains(event.target) && !mobileMenuBtn.contains(event.target)) {
+            mobileMenu.classList.remove('show');
+        }
+    });
+
+    function openSearchPopup() {
+        const searchPopup = document.getElementById('searchPopup');
+        searchPopup.classList.add('show');
+        document.getElementById('constructorSearch').focus();
+        // Close mobile menu if it's open
+        const mobileMenu = document.getElementById('mobileMenu');
+        mobileMenu.classList.remove('show');
+    }
+
+    function closeSearchPopup() {
+        const searchPopup = document.getElementById('searchPopup');
+        searchPopup.classList.remove('show');
+    }
+
+    let searchTimeout;
+    function searchConstructors(query) {
+        const resultsContainer = document.getElementById('searchResults');
+        
+        // Clear previous timeout
+        clearTimeout(searchTimeout);
+        
+        if (query.length < 2) {
+            resultsContainer.innerHTML = '<div class="loading">Type at least 2 characters to search...</div>';
+            return;
+        }
+
+        resultsContainer.innerHTML = `
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                Searching...
+            </div>
+        `;
+
+        // Add delay to prevent too many requests
+        searchTimeout = setTimeout(() => {
+            fetch('/api/search-constructors?query=' + encodeURIComponent(query), {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                if (data.length === 0) {
+                    resultsContainer.innerHTML = '<div class="no-results">No constructors found matching your search.</div>';
+                    return;
+                }
+
+                resultsContainer.innerHTML = data.map(constructor => `
+                    <div class="constructor-card">
+                        <img src="${constructor.image || '/images/default-avatar.png'}" 
+                             alt="${constructor.username}" 
+                             class="constructor-image"
+                             onerror="this.src='/images/default-avatar.png'">
+                        <div class="constructor-info">
+                            <div class="constructor-name">${constructor.username}</div>
+                            <div class="constructor-details">${constructor.email}</div>
+                        </div>
+                        <a href="/constructors/${constructor.id}" class="view-profile-btn">View Profile</a>
+                    </div>
+                `).join('');
+            })
+            .catch(error => {
+                console.error('Search error:', error);
+                resultsContainer.innerHTML = `
+                    <div class="error-message">
+                        ${error.message || 'An error occurred while searching. Please try again.'}
+                        <br>
+                        <small>Please try refreshing the page if this error persists.</small>
+                    </div>
+                `;
+            });
+        }, 300);
+    }
+
+    // Close popup when clicking outside
+    document.getElementById('searchPopup').addEventListener('click', function(event) {
+        if (event.target === this) {
+            closeSearchPopup();
+        }
+    });
+
+    function toggleDropdown() {
+        const dropdown = document.querySelector('.header-profile-dropdown');
+        dropdown.classList.toggle('active');
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!dropdown.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+    }
+
+    // Remove the existing logout button event listener if it exists
+    document.addEventListener('DOMContentLoaded', function() {
+        const existingLogoutBtn = document.querySelector('.logout-btn');
+        if (existingLogoutBtn) {
+            existingLogoutBtn.remove();
+        }
+    });
+
+    function openWorkSearchPopup() {
+        const searchPopup = document.getElementById('workSearchPopup');
+        searchPopup.classList.add('show');
+        document.getElementById('workSearch').focus();
+        
+        // Initialize select2 for skills filter
+        $('#skillFilter').select2({
+            placeholder: 'Select Skills',
+            allowClear: true,
+            width: '100%'
+        });
+    }
+
+    function closeWorkSearchPopup() {
+        const searchPopup = document.getElementById('workSearchPopup');
+        searchPopup.classList.remove('show');
+    }
+
+    let workSearchTimeout;
+    function searchWorks() {
+        const resultsContainer = document.getElementById('workSearchResults');
+        const query = document.getElementById('workSearch').value;
+        const skills = $('#skillFilter').val();
+        const timeFilter = document.getElementById('timeFilter').value;
+        
+        // Clear previous timeout
+        clearTimeout(workSearchTimeout);
+        
+        resultsContainer.innerHTML = `
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                Searching...
+            </div>
+        `;
+
+        // Add delay to prevent too many requests
+        workSearchTimeout = setTimeout(() => {
+            fetch('/api/search-works?' + new URLSearchParams({
+                query: query,
+                skills: skills ? skills.join(',') : '',
+                time: timeFilter
+            }), {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                if (data.length === 0) {
+                    resultsContainer.innerHTML = '<div class="no-results">No works found matching your search.</div>';
+                    return;
+                }
+
+                resultsContainer.innerHTML = data.map(work => `
+                    <div class="work-card" onclick="window.location.href='${work.has_bid ? `/work/${work.id}/bid/${work.bid_id}/edit` : `/work/${work.id}/bid`}'">
+                        <h3 class="work-title">${work.title}</h3>
+                        <div class="work-meta">
+                            Posted ${work.created_at_human}
+                            <span class="work-meta-dot"></span>
+                            Budget: $${work.budget.toLocaleString()}
+                        </div>
+                        <div class="work-description">${work.description.substring(0, 150)}...</div>
+                        <div class="work-skills">
+                            ${work.skills.map(skill => `
+                                <span class="skill-tag">${skill.name}</span>
+                            `).join('')}
+                        </div>
+                        ${work.has_bid ? '<div class="bid-status">You have already bid on this work</div>' : ''}
+                    </div>
+                `).join('');
+            })
+            .catch(error => {
+                console.error('Search error:', error);
+                resultsContainer.innerHTML = `
+                    <div class="error-message">
+                        ${error.message || 'An error occurred while searching. Please try again.'}
+                        <br>
+                        <small>Please try refreshing the page if this error persists.</small>
+                    </div>
+                `;
+            });
+        }, 300);
+    }
+
+    // Add event listeners for filters
+    document.getElementById('skillFilter').addEventListener('change', searchWorks);
+    document.getElementById('timeFilter').addEventListener('change', searchWorks);
+
+    // Close popup when clicking outside
+    document.getElementById('workSearchPopup').addEventListener('click', function(event) {
+        if (event.target === this) {
+            closeWorkSearchPopup();
+        }
+    });
+</script> 

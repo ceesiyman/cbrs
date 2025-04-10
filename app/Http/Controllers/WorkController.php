@@ -271,4 +271,41 @@ class WorkController extends Controller
         return 'images/default-work-icon.svg';
     }
 
+    public function worksBySkill($skillId)
+    {
+        $skill = Skill::findOrFail($skillId);
+        
+        // Get works that have this skill
+        $works = Work::whereHas('skills', function($query) use ($skillId) {
+            $query->where('skills.id', $skillId);
+        })->where('status', '!=', 'completed')
+          ->where('assigned', false)
+          ->latest()
+          ->paginate(10);
+        
+        return view('work.by-skill', compact('works', 'skill'));
+    }
+    
+ 
+    public function allSkills()
+    {
+        $skills = Skill::orderBy('name')->get();
+        return view('skills.all', compact('skills'));
+    }
+
+    public function topWorks()
+    {
+        // Get completed works with their highest bid amounts
+        $topWorks = Work::where('status', 'completed')
+            ->where('assigned', true)
+            ->with(['client', 'constructor', 'skills'])
+            ->withCount('bids')
+            ->withMax('bids', 'bid_amount')
+            ->orderByDesc('bids_max_bid_amount')
+            ->take(9)
+            ->get();
+            
+        return view('works.top', compact('topWorks'));
+    }
+
 } 

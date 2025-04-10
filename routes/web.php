@@ -47,6 +47,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/work/{work}/bid', [WorkController::class, 'bid'])->name('work.bid');
     Route::post('/work/{work}/bid', [WorkController::class, 'storeBid'])->name('work.bid.store');
     Route::post('/work/{work}/assign', [WorkController::class, 'assign'])->name('work.assign');
+    Route::get('/top-works', [WorkController::class, 'topWorks'])->name('works.top');
     Route::patch('/works/{work}/status', [WorkController::class, 'updateStatus'])
         ->name('work.update-status');
 
@@ -82,3 +83,6 @@ Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.up
 Route::get('/api/search-works', [WorkSearchController::class, 'search']);
 
 Route::get('/recent-works', [WorkController::class, 'recentWorks'])->name('recent-works');
+
+Route::get('/works/skill/{skill}', [WorkController::class, 'worksBySkill'])->name('works.by.skill');
+Route::get('/skills/all', [WorkController::class, 'allSkills'])->name('skills.all');

@@ -186,7 +186,7 @@
                                 }}
                             </span>
                         </div>
-                        <a href="{{ route('work.show', $work->id) }}" class="apply-button">Apply now</a>
+                        <a href="{{ route('work.bid', $work->id) }}" class="apply-button">Apply now</a>
                     </div>
                 </div>
             @empty

@@ -4,7 +4,9 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use App\Models\Work;
+use App\Models\Skill;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Cache;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,6 +29,27 @@ class AppServiceProvider extends ServiceProvider
                 ->get();
             
             $view->with('recentWorks', $recentWorks);
+        });
+
+        View::composer('*', function ($view) {
+            $skills = Cache::remember('all_skills', 60*24, function () {
+                return Skill::orderBy('name')->get();
+            });
+            
+            $view->with('skills', $skills);
+        });
+
+        View::composer('*', function ($view) {
+            $topWorks = Work::where('status', 'completed')
+                ->where('assigned', true)
+                ->with(['client', 'constructor', 'skills'])
+                ->withCount('bids')
+                ->withMax('bids', 'bid_amount')
+                ->orderByDesc('bids_max_bid_amount')
+                ->take(9)
+                ->get();
+                
+            $view->with('topWorks', $topWorks);
         });
     }
 }
