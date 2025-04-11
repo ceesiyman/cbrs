@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Work;
+use App\Models\User;
 use App\Models\Skill;
 use App\Models\WorkBid;
 use Illuminate\Http\Request;
@@ -50,29 +51,44 @@ class WorkController extends Controller
     }
 
     public function index()
-    {
-        $user = auth()->user();
+{
+    $user = auth()->user();
+    
+    if ($user->isConstructor()) {
+        // Get works assigned to the constructor (only accepted assignments)
+        $assignedWorks = Work::where('constructor_id', $user->id)
+                            ->where(function($query) {
+                                $query->where('assigned', true)
+                                      ->orWhere(function($q) {
+                                          $q->where('is_hire_request', true)
+                                            ->where('hire_status', 'accepted');
+                                      });
+                            })
+                            ->latest()
+                            ->get();
         
-        if ($user->isConstructor()) {
-            // Get works assigned to the constructor
-            $assignedWorks = Work::where('constructor_id', $user->id)
-                                ->latest()
-                                ->get();
-            
-            // Get works where they are the client
-            $clientWorks = Work::where('client_id', $user->id)
-                              ->latest()
-                              ->get();
-        } else {
-            // For clients, only get their posted works
-            $assignedWorks = collect(); // Empty collection
-            $clientWorks = Work::where('client_id', $user->id)
-                              ->latest()
-                              ->get();
-        }
-
-        return view('work.index', compact('assignedWorks', 'clientWorks'));
+        // Get hire requests pending for this constructor
+        $hireRequests = Work::where('constructor_id', $user->id)
+                           ->where('is_hire_request', true)
+                           ->where('hire_status', 'pending')
+                           ->latest()
+                           ->get();
+        
+        // Get works where they are the client
+        $clientWorks = Work::where('client_id', $user->id)
+                          ->latest()
+                          ->get();
+    } else {
+        // For clients, only get their posted works
+        $assignedWorks = collect(); // Empty collection
+        $hireRequests = collect(); // Empty collection
+        $clientWorks = Work::where('client_id', $user->id)
+                          ->latest()
+                          ->get();
     }
+
+    return view('work.index', compact('assignedWorks', 'clientWorks', 'hireRequests'));
+}
 
     public function unassigned()
     {
@@ -307,5 +323,74 @@ class WorkController extends Controller
             
         return view('works.top', compact('topWorks'));
     }
+
+    public function showHireForm(User $constructor)
+{
+    // Get the authenticated client's unassigned works
+    $unassignedWorks = Work::where('client_id', auth()->id())
+                          ->where('assigned', false)
+                          ->get();
+    
+    return view('work.hire-form', compact('constructor', 'unassignedWorks'));
+}
+
+public function sendHireRequest(Request $request, User $constructor)
+{
+    $request->validate([
+        'work_id' => 'required|exists:works,id'
+    ]);
+    
+    $work = Work::findOrFail($request->work_id);
+    
+    // Check if the work belongs to the authenticated user
+    if ($work->client_id !== auth()->id()) {
+        return back()->with('error', 'You can only assign your own works.');
+    }
+    
+    // Check if the work is already assigned
+    if ($work->assigned) {
+        return back()->with('error', 'This work is already assigned.');
+    }
+    
+    // Set hire request properties
+    $work->update([
+        'constructor_id' => $constructor->id,
+        'is_hire_request' => true,
+        'hire_status' => 'pending'
+    ]);
+    
+    // Notification logic can be added here
+    
+    return redirect()->route('work.index')->with('success', 'Hire request sent successfully.');
+}
+
+public function respondToHireRequest(Request $request, Work $work)
+{
+    $request->validate([
+        'response' => 'required|in:accept,decline'
+    ]);
+    
+    if ($work->constructor_id !== auth()->id()) {
+        return back()->with('error', 'This hire request is not for you.');
+    }
+    
+    if ($request->response === 'accept') {
+        $work->update([
+            'assigned' => true,
+            'hire_status' => 'accepted',
+            'status' => 'in-progress' // or whatever initial status you prefer
+        ]);
+        
+        return redirect()->route('work.index')->with('success', 'You have accepted the work.');
+    } else {
+        $work->update([
+            'constructor_id' => null,
+            'is_hire_request' => false,
+            'hire_status' => 'declined'
+        ]);
+        
+        return redirect()->route('work.index')->with('success', 'You have declined the work.');
+    }
+}
 
 } 

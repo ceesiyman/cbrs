@@ -95,6 +95,7 @@
         width: 3rem;
         height: 3rem;
         border-radius: 50%;
+        object-fit: cover;
     }
 
     .profile-info {
@@ -204,6 +205,19 @@
         border-bottom-right-radius: 0.375rem;
     }
 
+    .search-loading {
+        text-align: center;
+        padding: 1rem;
+        display: none;
+    }
+
+    .search-error {
+        color: #ef4444;
+        text-align: center;
+        padding: 1rem;
+        display: none;
+    }
+
     @media (min-width: 640px) {
         .search-form {
             flex-direction: row;
@@ -237,61 +251,181 @@
                 <div class="search-section">
                     <div class="search-form">
                         <input type="text" 
-                               placeholder="Search constructors by name, skills, or location" 
+                               id="constructor-search"
+                               name="search"
+                               value="{{ request('search') }}"
+                               placeholder="Search constructors by name" 
                                class="search-input">
-                        <select class="filter-select">
+                        <select name="specialty" id="specialty-filter" class="filter-select">
                             <option value="">Filter by specialty</option>
-                            <option value="residential">Residential</option>
-                            <option value="commercial">Commercial</option>
-                            <option value="industrial">Industrial</option>
-                            <option value="renovation">Renovation</option>
+                            @foreach($skills as $skill)
+                                <option value="{{ $skill->name }}" {{ request('specialty') == $skill->name ? 'selected' : '' }}>
+                                    {{ $skill->name }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
                 </div>
 
-                <!-- Constructors Grid -->
-                <div class="constructors-grid">
-                    <!-- Constructor Card Template -->
-                    <div class="constructor-card">
-                        <div class="card-content">
-                            <div class="profile-header">
-                                <img class="profile-image" src="https://via.placeholder.com/100" alt="Constructor profile">
-                                <div class="profile-info">
-                                    <h3 class="profile-name">John Doe</h3>
-                                    <p class="profile-role">Residential Constructor</p>
-                                </div>
-                            </div>
-                            <div class="rating">
-                                <svg class="star-icon" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                </svg>
-                                <span class="rating-text">4.8 (156 reviews)</span>
-                            </div>
-                            <p class="profile-description">Specializing in modern residential construction with 10+ years of experience.</p>
-                            <div class="tags">
-                                <span class="tag">Residential</span>
-                                <span class="tag">New Construction</span>
-                                <span class="tag">Renovation</span>
-                            </div>
-                            <button class="view-profile-btn">View Profile</button>
-                        </div>
-                    </div>
+                <!-- Loading and Error States -->
+                <div id="search-loading" class="search-loading">Searching constructors...</div>
+                <div id="search-error" class="search-error"></div>
 
-                    <!-- Add more constructor cards here -->
+                <!-- Constructors Grid -->
+                <div id="constructors-grid" class="constructors-grid">
+                    @forelse($constructors as $constructor)
+                        <div class="constructor-card">
+                            <div class="card-content">
+                                <div class="profile-header">
+                                <img src="{{ $constructor->image ?? asset('images/default-avatar.png') }}" 
+                                     alt="{{ $constructor->username }}" 
+                                     class="profile-image">
+                                    <div class="profile-info">
+                                        <h3 class="profile-name">{{ $constructor->username }}</h3>
+                                        <p class="profile-role">{{ $constructor->skills->first() ? $constructor->skills->first()->name : 'Constructor' }}</p>
+                                    </div>
+                                </div>
+                                
+                                <p class="profile-description">
+                                    {{ $constructor->experience->first() ? $constructor->experience->first()->description : 'Professional constructor available for hire.' }}
+                                </p>
+                                <div class="tags">
+                                    @foreach($constructor->skills->take(3) as $skill)
+                                        <span class="tag">{{ $skill->name }}</span>
+                                    @endforeach
+                                </div>
+                                <a href="{{ route('constructor.profile', $constructor->id) }}" class="view-profile-btn">View Profile</a>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="col-span-full">
+                            <p class="text-center text-gray-500">No constructors found matching your criteria.</p>
+                        </div>
+                    @endforelse
                 </div>
 
                 <!-- Pagination -->
-                <div class="pagination">
-                    <nav class="pagination-nav">
-                        <a href="#" class="page-link">Previous</a>
-                        <a href="#" class="page-link">1</a>
-                        <a href="#" class="page-link">2</a>
-                        <a href="#" class="page-link">3</a>
-                        <a href="#" class="page-link">Next</a>
-                    </nav>
+                <div id="pagination" class="pagination">
+                    {{ $constructors->withQueryString()->links() }}
                 </div>
             </div>
         </div>
     </div>
 </div>
-@endsection 
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('constructor-search');
+        const specialtyFilter = document.getElementById('specialty-filter');
+        const constructorsGrid = document.getElementById('constructors-grid');
+        const searchLoading = document.getElementById('search-loading');
+        const searchError = document.getElementById('search-error');
+        const pagination = document.getElementById('pagination');
+        
+        let searchTimeout = null;
+        
+        // Function to create constructor card
+        function createConstructorCard(constructor) {
+            return `
+                <div class="constructor-card">
+                    <div class="card-content">
+                        <div class="profile-header">
+                            <img src="${constructor.image || '/images/default-avatar.png'}" 
+                                 alt="${constructor.username}" 
+                                 class="profile-image">
+                            <div class="profile-info">
+                                <h3 class="profile-name">${constructor.username}</h3>
+                                <p class="profile-role">Constructor</p>
+                            </div>
+                        </div>
+                        
+                        <p class="profile-description">
+                            Professional constructor available for hire.
+                        </p>
+                        <div class="tags">
+                                    @foreach($constructor->skills->take(3) as $skill)
+                                        <span class="tag">{{ $skill->name }}</span>
+                                    @endforeach
+                                </div>
+                        <a href="/constructors/${constructor.id}" class="view-profile-btn">View Profile</a>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Function to search constructors
+        async function searchConstructors(query) {
+            searchLoading.style.display = 'block';
+            searchError.style.display = 'none';
+            
+            try {
+                const response = await fetch(`/api/search-constructors?query=${encodeURIComponent(query)}`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to search constructors');
+                }
+                
+                const constructors = await response.json();
+                
+                constructorsGrid.innerHTML = '';
+                pagination.style.display = 'none';
+                
+                if (constructors.length === 0) {
+                    constructorsGrid.innerHTML = `
+                        <div class="col-span-full">
+                            <p class="text-center text-gray-500">No constructors found matching your search.</p>
+                        </div>
+                    `;
+                } else {
+                    constructors.forEach(constructor => {
+                        constructorsGrid.innerHTML += createConstructorCard(constructor);
+                    });
+                }
+            } catch (error) {
+                searchError.textContent = 'An error occurred while searching. Please try again.';
+                searchError.style.display = 'block';
+                console.error('Search error:', error);
+            } finally {
+                searchLoading.style.display = 'none';
+            }
+        }
+        
+        // Initialize search input event listener
+        searchInput.addEventListener('input', function(e) {
+            const query = e.target.value.trim();
+            
+            // Clear any existing timeout
+            if (searchTimeout) {
+                clearTimeout(searchTimeout);
+            }
+            
+            // If search query is empty, reload the page to show default constructors
+            if (query === '') {
+                const currentUrl = new URL(window.location);
+                currentUrl.searchParams.delete('search');
+                window.location.href = currentUrl.href;
+                return;
+            }
+            
+            // Set a timeout to avoid making too many requests
+            searchTimeout = setTimeout(() => {
+                searchConstructors(query);
+            }, 300);
+        });
+        
+        // Initialize specialty filter event listener
+        specialtyFilter.addEventListener('change', function() {
+            const specialty = this.value;
+            const currentUrl = new URL(window.location);
+            
+            if (specialty) {
+                currentUrl.searchParams.set('specialty', specialty);
+            } else {
+                currentUrl.searchParams.delete('specialty');
+            }
+            
+            window.location.href = currentUrl.href;
+        });
+    });
+</script>
+@endsection

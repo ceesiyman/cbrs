@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Models\Work;
 use App\Models\Skill;
+use App\Models\User;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Cache;
 
@@ -50,6 +51,14 @@ class AppServiceProvider extends ServiceProvider
                 ->get();
                 
             $view->with('topWorks', $topWorks);
+        });
+
+        View::composer('*', function ($view) {
+            $constructors = User::where('role', 'Constructor')
+                ->with(['skills', 'projects', 'works'])
+                ->paginate(9);
+                
+            $view->with('constructors', $constructors);
         });
     }
 }

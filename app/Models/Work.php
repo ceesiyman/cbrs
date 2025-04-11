@@ -17,12 +17,15 @@ class Work extends Model
         'status',
         'start_date',
         'total_cost',
+        'is_hire_request',
+        'hire_status',
         'budget'
     ];
 
     protected $casts = [
         'start_date' => 'date',
         'assigned' => 'boolean',
+        'is_hire_status' => 'boolean',
         'total_cost' => 'integer',
         'budget' => 'integer'
     ];

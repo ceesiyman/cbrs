@@ -21,7 +21,7 @@
         align-items: center;
     }
 
-    .constructor-image {
+    .constructor1-image {
         width: 100%;
         max-width: 450px;
         height: auto;
@@ -113,7 +113,7 @@
 <section class="find-constructors">
     <div class="find-container">
         <div class="image-side">
-            <img src="{{ asset('images/constructor-professional.jpg') }}" alt="Professional Constructor" class="constructor-image">
+            <img src="{{ asset('images/constructor-professional.jpg') }}" alt="Professional Constructor" class="constructor1-image">
         </div>
         <div class="content-side">
             <h2 class="find-title">Find The Best <span>Constructors</span> Here</h2>

@@ -86,3 +86,13 @@ Route::get('/recent-works', [WorkController::class, 'recentWorks'])->name('recen
 
 Route::get('/works/skill/{skill}', [WorkController::class, 'worksBySkill'])->name('works.by.skill');
 Route::get('/skills/all', [WorkController::class, 'allSkills'])->name('skills.all');
+
+Route::get('/constructors', [App\Http\Controllers\ConstructorController::class, 'index'])
+    ->name('constructors.index');
+Route::get('/constructor/{id}', [App\Http\Controllers\ConstructorProfileController::class, 'show'])
+    ->name('constructor.profile');
+
+    Route::get('/hire-constructor/{constructor}',[WorkController::class, 'showHireForm'])->name('hire.constructor.form');
+    Route::post('/hire-constructor/{constructor}', [WorkController::class, 'sendHireRequest'])->name('hire.constructor.send');   
+    Route::post('/work/{work}/respond-hire-request', [WorkController::class, 'respondToHireRequest'])
+    ->name('work.respond-hire-request');

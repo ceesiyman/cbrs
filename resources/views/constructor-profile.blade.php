@@ -2,6 +2,7 @@
 
 @section('content')
 <style>
+    /* All existing CSS styles remain unchanged */
     .profile-container {
         max-width: 1200px;
         margin: 2rem auto;
@@ -309,7 +310,11 @@
             </div>
 
             <div class="profile-actions">
-                <a href="#" class="action-button primary-button">Hire Now</a>
+                @auth
+                    <a href="{{ route('hire.constructor.form', $constructor) }}" class="action-button primary-button">Hire Now</a>
+                @else
+                    <a href="{{ route('login') }}?redirect={{ urlencode(route('hire.constructor.form', $constructor)) }}" class="action-button primary-button">Hire Now</a>
+                @endauth
                 <a href="#" class="action-button secondary-button">Message</a>
             </div>
         </div>
@@ -410,4 +415,4 @@
         @endif
     </div>
 </div>
-@endsection 
+@endsection

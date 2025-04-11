@@ -221,6 +221,41 @@
         padding: 0;
     }
 
+    .hire-request-actions {
+        display: flex;
+        gap: 0.5rem;
+        z-index: 2;
+        position: relative;
+    }
+
+    .hire-action-btn {
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.375rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+    }
+
+    .accept-btn {
+        background-color: #10b981;
+        color: white;
+    }
+
+    .decline-btn {
+        background-color: #ef4444;
+        color: white;
+    }
+
+    .hire-status-badge {
+        background-color: #fef3c7;
+        color: #92400e;
+        padding: 0.375rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
     @media (max-width: 768px) {
         .works-container {
             margin: 1rem auto;
@@ -237,7 +272,7 @@
         <h1 class="works-title">My Works</h1>
         <p class="works-subtitle">
             @if(auth()->user()->isConstructor())
-                View your assigned works and client projects
+                View your assigned works, hire requests, and client projects
             @else
                 Manage your posted projects
             @endif
@@ -246,6 +281,57 @@
 
     <div class="works-sections">
         @if(auth()->user()->isConstructor())
+            <!-- Hire Requests Section -->
+            <div class="works-section">
+                <div class="section-header">
+                    <h2 class="section-title">Hire Requests</h2>
+                    <span class="section-count">{{ $hireRequests->count() }}</span>
+                </div>
+                
+                @if($hireRequests->isEmpty())
+                    <div class="empty-state">
+                        <p>No hire requests at the moment.</p>
+                    </div>
+                @else
+                    <div class="works-grid">
+                        @foreach($hireRequests as $work)
+                        <div class="work-card" onclick="window.location.href='{{ route('work.show', $work) }}'">
+                                <h3 class="work-title">{{ $work->title }}</h3>
+                                <div class="work-meta">
+                                    Posted by {{ $work->client->username }}
+                                    <span class="work-meta-dot"></span>
+                                    {{ $work->created_at->diffForHumans() }}
+                                </div>
+                                <div class="work-description">
+                                    {{ $work->description }}
+                                </div>
+                                <div class="work-footer">
+                                    <div class="hire-request-actions" onclick="event.stopPropagation()">
+                                        <form method="POST" action="{{ route('work.respond-hire-request', $work) }}" class="status-form">
+                                            @csrf
+                                            <input type="hidden" name="response" value="accept">
+                                            <button type="submit" class="hire-action-btn accept-btn">
+                                                Accept
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{{ route('work.respond-hire-request', $work) }}" class="status-form">
+                                            @csrf
+                                            <input type="hidden" name="response" value="decline">
+                                            <button type="submit" class="hire-action-btn decline-btn">
+                                                Decline
+                                            </button>
+                                        </form>
+                                    </div>
+                                    <span class="work-budget">
+                                        ${{ number_format($work->budget) }}
+                                    </span>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+
             <!-- Assigned Works Section -->
             <div class="works-section">
                 <div class="section-header">
@@ -335,7 +421,15 @@
                                     Posted by {{ $work->client->username }}
                                 @else
                                     @if($work->constructor)
-                                        Assigned to {{ $work->constructor->username }}
+                                        @if($work->is_hire_request && $work->hire_status == 'pending')
+                                            <span class="hire-status-badge">Hire Request Pending</span>
+                                        @elseif($work->is_hire_request && $work->hire_status == 'accepted')
+                                            Assigned to {{ $work->constructor->username }}
+                                        @elseif($work->is_hire_request && $work->hire_status == 'declined')
+                                            <span class="hire-status-badge">Hire Request Declined</span>
+                                        @else
+                                            Assigned to {{ $work->constructor->username }}
+                                        @endif
                                     @else
                                         Not assigned
                                     @endif
@@ -361,4 +455,4 @@
         </div>
     </div>
 </div>
-@endsection 
+@endsection

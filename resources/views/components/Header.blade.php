@@ -112,6 +112,13 @@
         height: 18px;
     }
 
+    .constructor-image {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
     @media (max-width: 768px) {
         .nav-links {
             display: none;
@@ -493,6 +500,14 @@
                         </svg>
                         My Profile
                     </a>
+
+                    <a href="{{ route('dashboard') }}" class="dropdown-item">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        Dashboard
+                    </a>
                     
                     @if(auth()->user()->isConstructor())
                         <a href="{{ route('bids.index') }}" class="dropdown-item">
@@ -553,6 +568,14 @@
                                       d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
                             My Profile
+                        </a>
+
+                        <a href="{{ route('dashboard') }}" class="dropdown-item">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        Dashboard
                         </a>
                         
                         @if(auth()->user()->isConstructor())
