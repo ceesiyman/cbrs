@@ -201,76 +201,7 @@
 </footer> 
 
 <!-- Search Popup -->
-<div id="searchPopup" class="search-popup">
-    <div class="search-container">
-        <div class="search-header">
-            <h3 class="search-title">Search Constructors</h3>
-            <button class="close-btn" onclick="closeSearchPopup()">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
-        </div>
-        <div class="search-form">
-            <input 
-                type="text" 
-                id="constructorSearch" 
-                class="search-input" 
-                placeholder="Search by name or skills..."
-                oninput="searchConstructors(this.value)"
-            >
-        </div>
-        <div id="searchResults" class="search-results">
-            <div class="loading">
-                Type to search constructors...
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Modify the work search popup HTML to include a form -->
-<div id="workSearchPopup" class="search-popup">
-    <div class="search-container">
-        <div class="search-header">
-            <h3 class="search-title">Search Available Works</h3>
-            <button class="close-btn" onclick="closeWorkSearchPopup()">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
-        </div>
-        
-        <div class="search-form">
-            <div class="search-filters">
-                <select id="skillFilter" class="filter-select" multiple>
-                    <option value="">Select Skills</option>
-                    @foreach(App\Models\Skill::orderBy('name')->get() as $skill)
-                        <option value="{{ $skill->id }}">{{ $skill->name }}</option>
-                    @endforeach
-                </select>
-                
-                <select id="timeFilter" class="filter-select">
-                    <option value="">Any Time</option>
-                    <option value="today">Today</option>
-                    <option value="week">This Week</option>
-                    <option value="month">This Month</option>
-                </select>
-            </div>
-            
-            <input type="text" 
-                   id="workSearch" 
-                   class="search-input" 
-                   placeholder="Search works by title or description..."
-                   oninput="searchWorks()">
-        </div>
-        
-        <div id="workSearchResults" class="search-results">
-            <div class="loading">
-                Search for available works...
-            </div>
-        </div>
-    </div>
-</div>
 
 <script>
     function toggleMobileMenu() {
