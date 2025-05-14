@@ -43,6 +43,7 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
             'username' => ['required', 'string', 'max:255', 'unique:users'],
+            'name' => ['required', 'string', 'max:255', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'phone_number' => ['required', 'string', 'max:20'],
             'role' => ['required', 'string', 'in:Constructor,Client'],
@@ -50,6 +51,7 @@ class AuthController extends Controller
         ]);
 
         $user = User::create([
+            'name' => $validated['name'],
             'username' => $validated['username'],
             'email' => $validated['email'],
             'phone_number' => $validated['phone_number'],
