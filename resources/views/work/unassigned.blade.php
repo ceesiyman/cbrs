@@ -155,6 +155,104 @@
         font-size: 0.875rem;
     }
 
+    /* Filter styles */
+    .filter-section {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid #e5e7eb;
+    }
+
+    .filter-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+
+    .filter-form {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .filter-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #4b5563;
+    }
+
+    .filter-input {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        outline: none;
+        font-size: 0.95rem;
+    }
+
+    .filter-input:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+    }
+
+    .filter-buttons {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 1rem;
+        gap: 0.75rem;
+    }
+
+    .filter-reset, .filter-apply {
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .filter-reset {
+        background-color: white;
+        border: 1px solid #d1d5db;
+        color: #4b5563;
+    }
+
+    .filter-apply {
+        background-color: #2563eb;
+        border: 1px solid #2563eb;
+        color: white;
+    }
+
+    .filter-reset:hover {
+        background-color: #f9fafb;
+    }
+
+    .filter-apply:hover {
+        background-color: #1d4ed8;
+    }
+
+    .work-skills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .skill-tag {
+        background-color: #f1f5f9;
+        color: #475569;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+    }
+
     @media (max-width: 768px) {
         .works-container {
             margin: 1rem auto;
@@ -175,6 +273,10 @@
         .work-card {
             padding: 1.25rem;
         }
+
+        .filter-form {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 
@@ -186,10 +288,56 @@
         </p>
     </div>
 
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <h2 class="filter-title">Filter Works</h2>
+        <form action="{{ route('work.unassigned') }}" method="get" class="filter-form">
+            <div class="filter-group">
+                <label for="search" class="filter-label">Search</label>
+                <input type="text" id="search" name="search" value="{{ request('search') }}" placeholder="Search by title or description" class="filter-input">
+            </div>
+            
+            <div class="filter-group">
+                <label for="skill" class="filter-label">Skills</label>
+                <select id="skill" name="skill" class="filter-input">
+                    <option value="">All Skills</option>
+                    @foreach(App\Models\Skill::orderBy('name')->get() as $skill)
+                        <option value="{{ $skill->id }}" {{ request('skill') == $skill->id ? 'selected' : '' }}>{{ $skill->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="min_budget" class="filter-label">Min Budget</label>
+                <input type="number" id="min_budget" name="min_budget" value="{{ request('min_budget') }}" placeholder="Min $" class="filter-input">
+            </div>
+            
+            <div class="filter-group">
+                <label for="max_budget" class="filter-label">Max Budget</label>
+                <input type="number" id="max_budget" name="max_budget" value="{{ request('max_budget') }}" placeholder="Max $" class="filter-input">
+            </div>
+
+            <div class="filter-group">
+                <label for="sort" class="filter-label">Sort By</label>
+                <select id="sort" name="sort" class="filter-input">
+                    <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>Latest</option>
+                    <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Oldest</option>
+                    <option value="budget_high" {{ request('sort') == 'budget_high' ? 'selected' : '' }}>Budget (High to Low)</option>
+                    <option value="budget_low" {{ request('sort') == 'budget_low' ? 'selected' : '' }}>Budget (Low to High)</option>
+                </select>
+            </div>
+            
+            <div class="filter-buttons">
+                <a href="{{ route('work.unassigned') }}" class="filter-reset">Reset</a>
+                <button type="submit" class="filter-apply">Apply Filters</button>
+            </div>
+        </form>
+    </div>
+
     @if($works->isEmpty())
         <div class="empty-state">
-            <p class="empty-state-text">No available works found at the moment.</p>
-            @if(auth()->user()->isClient())
+            <p class="empty-state-text">No available works found matching your criteria.</p>
+            @if(auth()->user() && auth()->user()->isClient())
                 <a href="{{ route('work.create') }}" class="post-project-btn">Post a new project</a>
             @endif
         </div>
@@ -197,14 +345,19 @@
         <div class="works-grid">
             @foreach($works as $work)
                 @php
-                    $hasBid = $work->bids->where('constructor_id', auth()->id())->first();
+                    $hasBid = auth()->check() && $work->bids->where('constructor_id', auth()->id())->first();
                 @endphp
-                <div class="work-card" onclick="navigateToWork({{ $work->id }}, '{{ auth()->user()->isConstructor() ? ($hasBid ? 'edit-bid' : 'bid') : 'show' }}', {{ $hasBid ? $hasBid->id : 'null' }})">
+                <div class="work-card" onclick="navigateToWork({{ $work->id }}, '{{ auth()->check() && auth()->user()->isConstructor() ? ($hasBid ? 'edit-bid' : 'bid') : 'show' }}', {{ $hasBid ? $hasBid->id : 'null' }})">
                     <h2 class="work-title">{{ $work->title }}</h2>
                     <div class="work-meta">
                         Posted {{ $work->created_at->diffForHumans() }}
                         <span class="work-meta-dot"></span>
                         by {{ $work->client->username }}
+                    </div>
+                    <div class="work-skills">
+                        @foreach($work->skills as $skill)
+                            <span class="skill-tag">{{ $skill->name }}</span>
+                        @endforeach
                     </div>
                     <div class="work-description">
                         {{ $work->description }}
@@ -220,11 +373,15 @@
                             Budget: ${{ number_format($work->budget) }}
                         </span>
                     </div>
-                    @if($hasBid)
+                    @if(auth()->check() && $hasBid)
                         <div class="bid-status">You have already bid on this work</div>
                     @endif
                 </div>
             @endforeach
+        </div>
+
+        <div class="pagination mt-8">
+            {{ $works->withQueryString()->links() }}
         </div>
     @endif
 </div>

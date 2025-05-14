@@ -140,7 +140,7 @@
                 <h3>For Clients</h3>
                 <ul class="footer-links">
                     <li class="footer-link">
-                    <a href="#" class="nav-link" onclick="openSearchPopup(); return false;">Find constructors</a>
+                    <a href="{{ route('constructors.index') }}">Find constructors</a>
                     </li>
                     <li class="footer-link">
                         <a href="{{ route('work.create') }}">Post Project</a>
@@ -159,7 +159,7 @@
                 <h3>For Constructors</h3>
                 <ul class="footer-links">
                     <li class="footer-link">
-                    <a href="#" class="nav-link" onclick="openWorkSearchPopup(); return false;">Find work</a>
+                    <a href="{{ route('work.unassigned') }}">Find work</a>
                     </li>
                     <li class="footer-link">
                         <a href="{{ route('register') }}" class="nav-link">Create Account</a>

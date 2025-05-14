@@ -90,15 +90,61 @@ class WorkController extends Controller
     return view('work.index', compact('assignedWorks', 'clientWorks', 'hireRequests'));
 }
 
-    public function unassigned()
+    public function unassigned(Request $request)
     {
-        $works = Work::where('assigned', false)
-            ->with(['client', 'skills', 'bids' => function($query) {
-                $query->where('user_id', auth()->id());
-            }])
-            ->latest()
-            ->get();
-
+        // Create the base query for unassigned works
+        $query = Work::where('assigned', false)
+                     ->where('status', '!=', 'completed')
+                     ->with(['client', 'skills', 'bids']);
+        
+        // Apply search filter
+        if ($request->filled('search')) {
+            $searchTerm = $request->input('search');
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('title', 'like', "%{$searchTerm}%")
+                  ->orWhere('description', 'like', "%{$searchTerm}%");
+            });
+        }
+        
+        // Apply skill filter
+        if ($request->filled('skill')) {
+            $skillId = $request->input('skill');
+            $query->whereHas('skills', function($q) use ($skillId) {
+                $q->where('skills.id', $skillId);
+            });
+        }
+        
+        // Apply budget filters
+        if ($request->filled('min_budget')) {
+            $query->where('budget', '>=', $request->input('min_budget'));
+        }
+        
+        if ($request->filled('max_budget')) {
+            $query->where('budget', '<=', $request->input('max_budget'));
+        }
+        
+        // Apply sorting
+        if ($request->filled('sort')) {
+            switch ($request->input('sort')) {
+                case 'oldest':
+                    $query->oldest();
+                    break;
+                case 'budget_high':
+                    $query->orderByDesc('budget');
+                    break;
+                case 'budget_low':
+                    $query->orderBy('budget');
+                    break;
+                default:
+                    $query->latest();
+                    break;
+            }
+        } else {
+            $query->latest();
+        }
+        
+        $works = $query->paginate(9)->withQueryString();
+        
         return view('work.unassigned', compact('works'));
     }
 

@@ -19,6 +19,8 @@ class ConstructorController extends Controller
             $search_term = $request->search;
             $constructor_query->where(function($query) use ($search_term) {
                 $query->where('username', 'like', "%{$search_term}%")
+                  ->orWhere('name', 'like', "%{$search_term}%")
+                  ->orWhere('email', 'like', "%{$search_term}%")
                   ->orWhereHas('skills', function($skill_query) use ($search_term) {
                       $skill_query->where('name', 'like', "%{$search_term}%");
                   });
@@ -33,8 +35,24 @@ class ConstructorController extends Controller
             });
         }
         
+        // Filter constructors by location if provided
+        if ($request->filled('location')) {
+            $location_filter = $request->location;
+            $constructor_query->where('location', 'like', "%{$location_filter}%");
+        }
+        
+        // Filter constructors by experience if provided
+        if ($request->filled('experience')) {
+            $years_experience = (int)$request->experience;
+            $constructor_query->whereHas('experience', function($query) use ($years_experience) {
+                $query->selectRaw('user_id, COUNT(*) as exp_count')
+                      ->groupBy('user_id')
+                      ->havingRaw('COUNT(*) >= ?', [$years_experience]);
+            });
+        }
+        
         // Get constructors with pagination
-        $constructors = $constructor_query->paginate(9);
+        $constructors = $constructor_query->paginate(9)->withQueryString();
         
         // Get all skills for filter dropdown
         $skills = Skill::orderBy('name')->get();

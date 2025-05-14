@@ -480,8 +480,8 @@
 
     <div class="nav-links">
         <a href="{{ url('/') }}" class="nav-link">Home</a>
-        <a href="#" class="nav-link" onclick="openWorkSearchPopup(); return false;">Find work</a>
-        <a href="#" class="nav-link" onclick="openSearchPopup(); return false;">Find constructors</a>
+        <a href="{{ route('work.unassigned') }}" class="nav-link">Find work</a>
+        <a href="{{ route('constructors.index') }}" class="nav-link">Find constructors</a>
         @auth
             <a href="{{ route('work.index') }}" class="nav-link">My Works</a>
             <a href="{{ route('work.unassigned') }}" class="nav-link">Available Works</a>
@@ -549,8 +549,8 @@
     <div id="mobileMenu" class="mobile-menu">
         <div class="nav-links">
             <a href="{{ url('/') }}" class="nav-link">Home</a>
-            <a href="#" class="nav-link" onclick="openWorkSearchPopup(); return false;">Find work</a>
-            <a href="#" class="nav-link" onclick="openSearchPopup(); return false;">Find constructors</a>
+            <a href="{{ route('work.unassigned') }}" class="nav-link">Find work</a>
+            <a href="{{ route('constructors.index') }}" class="nav-link">Find constructors</a>
             @auth
                 <a href="{{ route('work.index') }}" class="nav-link">My Works</a>
                 <a href="{{ route('work.unassigned') }}" class="nav-link">Available Works</a>
