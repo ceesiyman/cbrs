@@ -480,7 +480,7 @@
                             </a>
                         </div>
                         <div class="bid-actions">
-                            <div class="bid-amount">${{ number_format($bid->bid_amount, 2) }}</div>
+                            <div class="bid-amount">Tsh {{ number_format($bid->bid_amount, 2) }}</div>
                             <span class="bid-status bid-status-{{ $bid->bid_status }}">
                                 {{ ucfirst($bid->bid_status) }}
                             </span>
