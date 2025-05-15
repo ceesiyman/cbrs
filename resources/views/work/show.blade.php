@@ -441,11 +441,11 @@
                 </div>
                 <div class="detail-item">
                     <div class="detail-label">Total Cost</div>
-                    <div class="detail-value">${{ number_format($work->total_cost, 2) }}</div>
+                    <div class="detail-value">Tsh {{ number_format($work->total_cost, 2) }}</div>
                 </div>
                 <div class="detail-item">
                     <div class="detail-label">Budget</div>
-                    <div class="detail-value">${{ number_format($work->budget, 2) }}</div>
+                    <div class="detail-value">Tsh {{ number_format($work->budget, 2) }}</div>
                 </div>
                 @if($work->bid_by)
                     <div class="detail-item">

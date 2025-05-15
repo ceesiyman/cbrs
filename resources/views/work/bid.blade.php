@@ -200,7 +200,7 @@
         
         <div class="budget-info">
             <div class="budget-label">Client's Budget</div>
-            <div class="budget-amount">${{ number_format($work->budget) }}</div>
+            <div class="budget-amount">Tsh {{ number_format($work->budget) }}</div>
         </div>
 
         <form action="{{ route('work.bid.store', $work) }}" method="POST">
