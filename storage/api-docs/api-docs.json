@@ -1,0 +1,405 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "CBRS API Documentation",
+        "description": "API for Construction Bidding and Recruitment System",
+        "contact": {
+            "name": "CBRS Support",
+            "email": "support@cbrs.com"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://my-default-host.com",
+            "description": "CBRS API Server"
+        }
+    ],
+    "paths": {
+        "/api/v1/construction/inquiry": {
+            "post": {
+                "tags": [
+                    "Construction"
+                ],
+                "summary": "Ask a question about construction",
+                "description": "Send a question about construction issues and get an AI-powered response",
+                "operationId": "inquiryConstruction",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "question"
+                                ],
+                                "properties": {
+                                    "question": {
+                                        "type": "string",
+                                        "example": "What is the current price range for cement in Dar es Salaam?"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "answer": {
+                                            "type": "string",
+                                            "example": "The current price range for cement in Dar es Salaam is between TSh 17,000 and TSh 20,000 per 50kg bag depending on the brand and quality."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Question is required"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "An error occurred while processing your request"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/search-constructors": {
+            "get": {
+                "tags": [
+                    "Constructors"
+                ],
+                "summary": "Search for constructors",
+                "description": "Search for constructors by name or username",
+                "operationId": "searchConstructors",
+                "parameters": [
+                    {
+                        "name": "query",
+                        "in": "query",
+                        "description": "Search query string",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "username": {
+                                                "type": "string",
+                                                "example": "JohnDoe"
+                                            },
+                                            "email": {
+                                                "type": "string",
+                                                "example": "john@example.com"
+                                            },
+                                            "image": {
+                                                "type": "string",
+                                                "example": "path/to/image.jpg",
+                                                "nullable": true
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "An error occurred while searching. Please try again."
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error message details"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/search-skills": {
+            "get": {
+                "tags": [
+                    "Skills"
+                ],
+                "summary": "Search for skills",
+                "description": "Search for skills by name",
+                "operationId": "searchSkills",
+                "parameters": [
+                    {
+                        "name": "query",
+                        "in": "query",
+                        "description": "Search query for skill name",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Carpentry"
+                                            },
+                                            "category": {
+                                                "type": "string",
+                                                "example": "Construction"
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "example": "Skill in working with wood to create structures"
+                                            },
+                                            "icon": {
+                                                "type": "string",
+                                                "example": "fa-hammer"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "An error occurred while processing your request"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Database connection error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/search-works": {
+            "get": {
+                "tags": [
+                    "Works"
+                ],
+                "summary": "Search for works",
+                "description": "Search for works by title, description, skills, or time period",
+                "operationId": "searchWorks",
+                "parameters": [
+                    {
+                        "name": "query",
+                        "in": "query",
+                        "description": "Search query string for title or description",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "skills",
+                        "in": "query",
+                        "description": "Comma-separated skill IDs to filter by",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "time",
+                        "in": "query",
+                        "description": "Time period filter (today, week, month)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "today",
+                                "week",
+                                "month"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "title": {
+                                                "type": "string",
+                                                "example": "Building Construction Project"
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "example": "We need help with a building construction project."
+                                            },
+                                            "budget": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 500000
+                                            },
+                                            "created_at_human": {
+                                                "type": "string",
+                                                "example": "2 days ago"
+                                            },
+                                            "skills": {
+                                                "type": "array",
+                                                "items": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Masonry"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "client": {
+                                                "type": "string",
+                                                "example": "ClientUsername"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "An error occurred while searching."
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error message details"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Constructors",
+            "description": "API endpoints for constructor-related operations"
+        },
+        {
+            "name": "Works",
+            "description": "API endpoints for work/project-related operations"
+        },
+        {
+            "name": "Skills",
+            "description": "API endpoints for skill-related operations"
+        },
+        {
+            "name": "Construction",
+            "description": "API endpoints for construction-related operations"
+        }
+    ]
+}

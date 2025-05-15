@@ -8,14 +8,14 @@ use Illuminate\Http\Request;
  * @OA\Info(
  *     title="CBRS API Documentation",
  *     version="1.0.0",
- *     description="Construction Business Recruitment System API documentation",
+ *     description="API for Construction Bidding and Recruitment System",
  *     @OA\Contact(
- *         email="info@cbrs.com",
+ *         email="support@cbrs.com",
  *         name="CBRS Support"
  *     ),
  *     @OA\License(
- *         name="Apache 2.0",
- *         url="http://www.apache.org/licenses/LICENSE-2.0.html"
+ *         name="MIT",
+ *         url="https://opensource.org/licenses/MIT"
  *     )
  * )
  * 
@@ -29,6 +29,26 @@ use Illuminate\Http\Request;
  *     type="http",
  *     scheme="bearer",
  *     bearerFormat="JWT"
+ * )
+ *
+ * @OA\Tag(
+ *     name="Constructors",
+ *     description="API endpoints for constructor-related operations"
+ * )
+ * 
+ * @OA\Tag(
+ *     name="Works",
+ *     description="API endpoints for work/project-related operations"
+ * )
+ * 
+ * @OA\Tag(
+ *     name="Skills",
+ *     description="API endpoints for skill-related operations"
+ * )
+ * 
+ * @OA\Tag(
+ *     name="Construction",
+ *     description="API endpoints for construction-related operations"
  * )
  */
 class SwaggerController extends Controller
