@@ -220,12 +220,12 @@
         
         <div class="current-bid-info">
             <div class="current-bid-label">Current Bid Amount</div>
-            <div class="current-bid-amount">${{ number_format($bid->bid_amount, 2) }}</div>
+            <div class="current-bid-amount">TSh {{ number_format($bid->bid_amount, 2) }}</div>
         </div>
 
         <div class="budget-info">
             <div class="budget-label">Client's Budget</div>
-            <div class="budget-amount">${{ number_format($work->budget) }}</div>
+            <div class="budget-amount">TSh {{ number_format($work->budget) }}</div>
         </div>
 
         <form action="{{ route('work.bid.update', ['work' => $work, 'bid' => $bid]) }}" method="POST">

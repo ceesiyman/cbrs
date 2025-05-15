@@ -309,12 +309,12 @@
             
             <div class="filter-group">
                 <label for="min_budget" class="filter-label">Min Budget</label>
-                <input type="number" id="min_budget" name="min_budget" value="{{ request('min_budget') }}" placeholder="Min $" class="filter-input">
+                <input type="number" id="min_budget" name="min_budget" value="{{ request('min_budget') }}" placeholder="Min TSh" class="filter-input">
             </div>
             
             <div class="filter-group">
                 <label for="max_budget" class="filter-label">Max Budget</label>
-                <input type="number" id="max_budget" name="max_budget" value="{{ request('max_budget') }}" placeholder="Max $" class="filter-input">
+                <input type="number" id="max_budget" name="max_budget" value="{{ request('max_budget') }}" placeholder="Max TSh" class="filter-input">
             </div>
 
             <div class="filter-group">
@@ -370,7 +370,7 @@
                             {{ ucfirst($work->status) }}
                         </span>
                         <span class="work-budget">
-                            Budget: ${{ number_format($work->budget) }}
+                            Budget: TSh {{ number_format($work->budget) }}
                         </span>
                     </div>
                     @if(auth()->check() && $hasBid)

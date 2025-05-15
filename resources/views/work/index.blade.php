@@ -323,7 +323,7 @@
                                         </form>
                                     </div>
                                     <span class="work-budget">
-                                        ${{ number_format($work->budget) }}
+                                        TSh {{ number_format($work->budget) }}
                                     </span>
                                 </div>
                             </div>
@@ -379,7 +379,7 @@
                                         </div>
                                     </div>
                                     <span class="work-budget">
-                                        ${{ number_format($work->budget) }}
+                                        TSh {{ number_format($work->budget) }}
                                     </span>
                                 </div>
                             </div>
@@ -445,7 +445,7 @@
                                     {{ ucfirst($work->status) }}
                                 </span>
                                 <span class="work-budget">
-                                    ${{ number_format($work->budget) }}
+                                    TSh {{ number_format($work->budget) }}
                                 </span>
                             </div>
                         </div>

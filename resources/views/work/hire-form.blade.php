@@ -163,7 +163,7 @@
                     <select name="work_id" id="work_id" class="form-select">
                         <option value="">-- Select a project --</option>
                         @foreach($unassignedWorks as $work)
-                            <option value="{{ $work->id }}">{{ $work->title }} (Budget: ${{ number_format($work->budget) }})</option>
+                            <option value="{{ $work->id }}">{{ $work->title }} (Budget: TSh {{ number_format($work->budget) }})</option>
                         @endforeach
                     </select>
                 @endif

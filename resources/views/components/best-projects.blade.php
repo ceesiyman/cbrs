@@ -16,7 +16,7 @@
                                 <div class="project-title">
                                     <div>
                                         <h3>{{ $work->title }}</h3>
-                                        <p class="project-role">{{ $work->bids_max_bid_amount ? '$'.number_format($work->bids_max_bid_amount, 2) : 'N/A' }}</p>
+                                        <p class="project-role">{{ $work->bids_max_bid_amount ? 'Tsh'.number_format($work->bids_max_bid_amount, 2) : 'N/A' }}</p>
                                     </div>
                                     <svg class="arrow-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>

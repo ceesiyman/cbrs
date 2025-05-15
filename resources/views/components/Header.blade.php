@@ -883,7 +883,7 @@
                         <div class="work-meta">
                             Posted ${work.created_at_human}
                             <span class="work-meta-dot"></span>
-                            Budget: $${work.budget.toLocaleString()}
+                            Budget: TSh ${work.budget.toLocaleString()}
                         </div>
                         <div class="work-description">${work.description.substring(0, 150)}...</div>
                         <div class="work-skills">

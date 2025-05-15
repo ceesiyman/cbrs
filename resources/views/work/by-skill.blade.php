@@ -22,7 +22,7 @@
                                 </svg>
                                 <span>{{ $work->start_date->format('M d, Y') }}</span>
                             </div>
-                            <div class="work-budget">${{ number_format($work->budget) }}</div>
+                            <div class="work-budget">Tsh {{ number_format($work->budget) }}</div>
                         </div>
                         
                         <div class="work-skills">

@@ -406,7 +406,7 @@
                                 Start date: {{ $work->start_date->format('M d, Y') }}
                             </div>
                             <div class="work-budget">
-                                ${{ number_format($work->budget) }}
+                                Tsh {{ number_format($work->budget) }}
                             </div>
                         </div>
                     </div>

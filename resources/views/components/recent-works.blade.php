@@ -179,7 +179,7 @@
                         <div class="bid-info">
                             <span class="bid-label">Highest bid</span>
                             <span class="bid-amount">
-                                ${{ 
+                                Tsh {{ 
                                     $work->bids()->exists() 
                                     ? number_format($work->bids()->max('bid_amount'), 0) 
                                     : '500' 
